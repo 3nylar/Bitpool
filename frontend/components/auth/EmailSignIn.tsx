@@ -58,7 +58,7 @@ export function EmailSignIn({ callbackUrl }: { callbackUrl: string }) {
       </Button>
       {error && (
         <div className="flex items-start gap-2 rounded-xl bg-danger-soft text-danger text-sm p-3">
-          <AlertCircle size={16} className="mt-0.5 flex-shrink-0" />
+          <AlertCircle size={16} className="mt-0.5 shrink-0" />
           <span>{error}</span>
         </div>
       )}
