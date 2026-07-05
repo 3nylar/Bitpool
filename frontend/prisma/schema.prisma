@@ -1,0 +1,79 @@
+// Prisma schema for the Liquidity Pool Simulator's authentication layer.
+//
+// Uses SQLite by default so the project runs with zero external setup for
+// local development and evaluation. For a real production deployment,
+// swap the datasource to Postgres (e.g. Vercel Postgres, Neon, Supabase)
+// by changing `provider` to "postgresql" and pointing DATABASE_URL at your
+// managed database -- the schema itself does not need to change.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// --- Standard Auth.js (NextAuth) models -------------------------------
+// These match the shape the Prisma adapter expects. `walletAddress` is our
+// own addition, used by the SIWE (wallet) credentials provider.
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  walletAddress String?   @unique
+  createdAt     DateTime  @default(now())
+
+  accounts Account[]
+  sessions Session[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// --- SIWE nonce tracking ------------------------------------------------
+// Short-lived, single-use nonces issued before a wallet sign-in, to prevent
+// signature replay attacks.
+
+model SiweNonce {
+  nonce     String   @id
+  createdAt DateTime @default(now())
+  usedAt    DateTime?
+}

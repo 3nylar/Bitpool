@@ -1,0 +1,128 @@
+@import "tailwindcss";
+
+:root {
+  /* --- Design tokens -------------------------------------------------
+     Canvas: soft, cool off-white -- calm and trustworthy rather than
+     stark white or dark-mode-by-default, appropriate for a finance-
+     adjacent educational tool people need to trust.
+     Primary: a confident, unsaturated blue used for all primary actions.
+     Teal / Coral: the two token colors, used consistently everywhere a
+     "side" of the pool needs a color (bucket visualizer, charts, badges).
+  ------------------------------------------------------------------- */
+  --canvas: #f7f9fc;
+  --canvas-alt: #eef2fa;
+  --surface: #ffffff;
+  --ink: #101828;
+  --ink-soft: #475467;
+  --ink-faint: #98a2b3;
+  --line: #e4e7ec;
+  --line-soft: #eef1f5;
+
+  --primary: #4f6ef7;
+  --primary-dark: #3b54d9;
+  --primary-soft: #e8edfe;
+
+  --teal: #14b8a6;
+  --teal-soft: #e3faf7;
+  --coral: #fb7185;
+  --coral-soft: #ffe9ec;
+
+  --success: #12b76a;
+  --success-soft: #e6f9ef;
+  --danger: #f04438;
+  --danger-soft: #feeceb;
+  --amber: #f79009;
+  --amber-soft: #fef3e0;
+
+  --shadow-soft: 0 1px 2px rgba(16, 24, 40, 0.04), 0 4px 16px rgba(16, 24, 40, 0.06);
+  --shadow-lifted: 0 8px 24px rgba(16, 24, 40, 0.10), 0 2px 6px rgba(16, 24, 40, 0.06);
+}
+
+@theme inline {
+  --color-canvas: var(--canvas);
+  --color-canvas-alt: var(--canvas-alt);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-faint: var(--ink-faint);
+  --color-line: var(--line);
+  --color-line-soft: var(--line-soft);
+
+  --color-primary: var(--primary);
+  --color-primary-dark: var(--primary-dark);
+  --color-primary-soft: var(--primary-soft);
+
+  --color-teal: var(--teal);
+  --color-teal-soft: var(--teal-soft);
+  --color-coral: var(--coral);
+  --color-coral-soft: var(--coral-soft);
+
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-amber: var(--amber);
+  --color-amber-soft: var(--amber-soft);
+
+  --font-display: var(--font-space-grotesk);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-plex-mono);
+}
+
+body {
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+.font-display {
+  font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+}
+
+.font-mono-num {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Soft, trustworthy gradient used sparingly (hero backdrop, primary CTA). */
+.gradient-trust {
+  background: linear-gradient(135deg, #eef2fa 0%, #eafaf8 50%, #f7f9fc 100%);
+}
+
+.gradient-primary-btn {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+}
+
+/* Respect reduced-motion preferences everywhere by default. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@keyframes float-gentle {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
+.animate-float-gentle {
+  animation: float-gentle 4s ease-in-out infinite;
+}
+
+@keyframes wave-shift {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.animate-wave-shift {
+  animation: wave-shift 6s linear infinite;
+}
+
+/* Visible keyboard focus ring everywhere, since default browser outlines
+   are frequently (and wrongly) suppressed in custom component styling. */
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}

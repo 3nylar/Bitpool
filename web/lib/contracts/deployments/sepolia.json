@@ -1,0 +1,19 @@
+{
+  "network": "sepolia",
+  "chainId": "11155111",
+  "deployedAt": "2026-07-05T21:15:27.261Z",
+  "contracts": {
+    "tokenA": {
+      "name": "sUSD",
+      "address": "0xC888b606C52412921e81C66aa3c3F2c6B3Be2E67"
+    },
+    "tokenB": {
+      "name": "sETH",
+      "address": "0xDb72f21a3A40456AC56deF1F240697b5AD9B89e1"
+    },
+    "pool": {
+      "address": "0x3cD218c3F25e798dD675C03E9DfaeAD14A0c87D3",
+      "feeBps": 30
+    }
+  }
+}
