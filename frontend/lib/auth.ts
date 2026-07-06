@@ -9,7 +9,7 @@ import { prisma } from "@/lib/prisma";
 /// paths:
 ///
 ///  1. Wallet (SIWE — Sign-In With Ethereum): the primary path for this
-///     product, since it's a Web3 app. The user signs a structured,
+///     product, since it's a frontend3 app. The user signs a structured,
 ///     human-readable message with their wallet; we verify the signature
 ///     server-side and recover their address. No password, no email needed.
 ///
@@ -41,7 +41,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         try {
           if (!credentials?.message || !credentials?.signature) return null;
 
-          const siwe = new SiweMessage(JSON.parse(credentials.message as string));
+          const siwe = new SiweMessage(
+            JSON.parse(credentials.message as string),
+          );
 
           // The nonce must have been issued by us (via /api/auth/siwe-nonce)
           // and not already used, to prevent replay of a captured signature.
@@ -75,7 +77,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             },
           });
 
-          return { id: user.id, name: user.name, walletAddress: user.walletAddress };
+          return {
+            id: user.id,
+            name: user.name,
+            walletAddress: user.walletAddress,
+          };
         } catch {
           return null;
         }
@@ -90,7 +96,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           pass: process.env.EMAIL_SERVER_PASSWORD,
         },
       },
-      from: process.env.EMAIL_FROM || "Liquidity Pool Simulator <no-reply@example.com>",
+      from:
+        process.env.EMAIL_FROM ||
+        "Liquidity Pool Simulator <no-reply@example.com>",
       maxAge: 15 * 60, // magic link valid for 15 minutes
     }),
   ],
@@ -103,7 +111,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async jwt({ token, user }) {
       if (user) {
         token.userId = user.id;
-        token.walletAddress = (user as { walletAddress?: string }).walletAddress ?? null;
+        token.walletAddress =
+          (user as { walletAddress?: string }).walletAddress ?? null;
       }
       return token;
     },

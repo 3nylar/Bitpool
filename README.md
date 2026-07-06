@@ -1,6 +1,6 @@
 # Bitpool — Liquidity Pool Simulator
 
-An educational, production-ready web app for learning how automated market
+An educational, production-ready frontend app for learning how automated market
 makers (constant-product AMMs) actually work — by running one. Real smart
 contract, real on-chain mechanics, real (if valueless) tokens on a public
 Ethereum test network. No real money, ever.
@@ -9,7 +9,7 @@ This repo contains two independent projects:
 
 ```
 contracts/   Solidity smart contracts (Hardhat) — the AMM pool + mock tokens
-web/         Next.js 15 frontend — landing page, auth, and the simulator dashboard
+frontend/         Next.js 15 frontend — landing page, auth, and the simulator dashboard
 ```
 
 ---
@@ -22,7 +22,7 @@ web/         Next.js 15 frontend — landing page, auth, and the simulator dashb
 - `MockERC20.sol` — a free, valueless, mintable token with a public `faucet()`.
 - **13 passing tests** (`contracts/test/LiquidityPoolAMM.test.js`) covering liquidity math, swap math, the fee mechanism, the first-depositor attack, slippage protection, and the batch-swap feature. Run them with `npm test` inside `contracts/`.
 
-**Frontend** (`web/`)
+**Frontend** (`frontend/`)
 
 - Landing page with a live-feeling animated hero visual, "how it works," feature grid, and FAQ.
 - Authentication via **Auth.js (NextAuth v5)** with two independent sign-in paths:
@@ -55,8 +55,8 @@ npm run deploy:sepolia  # deploys MockERC20 x2 + LiquidityPoolAMM, seeds initial
 ```
 
 The deploy script prints the three addresses you need and also writes them
-to `web/lib/contracts/deployments/sepolia.json` automatically. Copy them
-into `web/.env.local` (see below).
+to `frontend/lib/contracts/deployments/sepolia.json` automatically. Copy them
+into `frontend/.env.local` (see below).
 
 Optionally verify the contracts on Etherscan so anyone can read the source:
 
@@ -78,7 +78,7 @@ npm run verify:sepolia -- <POOL_ADDRESS> <TOKEN_A_ADDRESS> <TOKEN_B_ADDRESS> 30 
 ## 4. Configure and run the frontend locally
 
 ```bash
-cd web
+cd frontend
 npm install
 cp .env.example .env.local   # fill in the contract addresses from step 3, plus auth config
 npx prisma generate
@@ -93,7 +93,7 @@ email, claim free tokens from the faucet, and start experimenting.
 
 - `AUTH_SECRET`: generate with `npx auth secret` or `openssl rand -base64 32`.
 - Email magic links require real SMTP credentials to actually send mail — without them, wallet sign-in still works fully.
-- `DATABASE_URL` defaults to a local SQLite file for zero-setup development. **For production, switch to a managed Postgres database** (Vercel Postgres, Neon, Supabase, etc.): change `provider = "postgresql"` in `web/prisma/schema.prisma`, point `DATABASE_URL` at it, then run `npx prisma migrate deploy`. No other code changes are needed.
+- `DATABASE_URL` defaults to a local SQLite file for zero-setup development. **For production, switch to a managed Postgres database** (Vercel Postgres, Neon, Supabase, etc.): change `provider = "postgresql"` in `frontend/prisma/schema.prisma`, point `DATABASE_URL` at it, then run `npx prisma migrate deploy`. No other code changes are needed.
 
 ---
 
@@ -102,9 +102,9 @@ email, claim free tokens from the faucet, and start experimenting.
 **Recommended stack:** contracts on Sepolia (already done in step 3) + frontend on [Vercel](https://vercel.com).
 
 1. Push this repo to GitHub.
-2. Import the `web/` directory as a new Vercel project (set the project **root directory** to `web`).
-3. Add all the environment variables from `web/.env.example` in Vercel's Project Settings → Environment Variables, using your real Sepolia contract addresses, a production `DATABASE_URL` (Postgres — see above), real SMTP credentials, and a freshly generated `AUTH_SECRET`.
-4. Deploy. Vercel will run `npx prisma generate` automatically as part of the build if you add it to the build command (`prisma generate && next build`), or add a `postinstall` script (already included in `web/package.json`) that does this for you.
+2. Import the `frontend/` directory as a new Vercel project (set the project **root directory** to `frontend`).
+3. Add all the environment variables from `frontend/.env.example` in Vercel's Project Settings → Environment Variables, using your real Sepolia contract addresses, a production `DATABASE_URL` (Postgres — see above), real SMTP credentials, and a freshly generated `AUTH_SECRET`.
+4. Deploy. Vercel will run `npx prisma generate` automatically as part of the build if you add it to the build command (`prisma generate && next build`), or add a `postinstall` script (already included in `frontend/package.json`) that does this for you.
 5. Your simulator is now live at a public URL — anyone can sign in and use it without running anything locally.
 
 There is nothing in this app that requires the visitor to run a node,
@@ -123,7 +123,7 @@ install anything, or hold real cryptocurrency of any kind.
 
 ## 7. Known simplifications (documented, not accidental)
 
-- **Impermanent-loss baseline is stored client-side** (`localStorage`, keyed by wallet address) rather than in a backend indexer database. This is called out directly in `web/lib/hooks/useDepositBaseline.ts`. A larger-scale deployment would move this to the off-chain indexer described in the project's PRD, so it survives across devices.
+- **Impermanent-loss baseline is stored client-side** (`localStorage`, keyed by wallet address) rather than in a backend indexer database. This is called out directly in `frontend/lib/hooks/useDepositBaseline.ts`. A larger-scale deployment would move this to the off-chain indexer described in the project's PRD, so it survives across devices.
 - **Price/reserve chart history resets on page reload**, backfilled from a short recent block window on load. It's a live session view, not a permanent historical archive.
 - **"Simulate market activity" runs from the signed-in user's own wallet** via the contract's `batchSwap` function (one signature, several trades) rather than a separate always-on backend bot wallet — simpler to run, no infrastructure to maintain, and just as real on-chain.
 
@@ -140,7 +140,7 @@ contracts/
   scripts/syncAbi.js
   build.js                      (offline solc-js fallback compiler)
 
-web/
+frontend/
   app/
     page.tsx                    landing page
     login/page.tsx               sign-in (wallet + email)
