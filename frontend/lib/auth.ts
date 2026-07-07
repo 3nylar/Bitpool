@@ -9,7 +9,7 @@ import { prisma } from "@/lib/prisma";
 /// paths:
 ///
 ///  1. Wallet (SIWE — Sign-In With Ethereum): the primary path for this
-///     product, since it's a frontend3 app. The user signs a structured,
+///     product, since it's a Web3 app. The user signs a structured,
 ///     human-readable message with their wallet; we verify the signature
 ///     server-side and recover their address. No password, no email needed.
 ///
@@ -41,9 +41,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         try {
           if (!credentials?.message || !credentials?.signature) return null;
 
-          const siwe = new SiweMessage(
-            JSON.parse(credentials.message as string),
-          );
+          const siwe = new SiweMessage(credentials.message as string);
 
           // The nonce must have been issued by us (via /api/auth/siwe-nonce)
           // and not already used, to prevent replay of a captured signature.
