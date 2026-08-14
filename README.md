@@ -160,3 +160,4 @@ frontend/
   prisma/schema.prisma
   middleware.ts                 protects /simulator behind sign-in
 ```
+by Enilara Adefila
