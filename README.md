@@ -1,18 +1,13 @@
 # Bitpool
 
-<p align="center">
-  <strong>Learn how DeFi liquidity pools work by actually using one.</strong>
-</p>
+<strong>Learn how DeFi liquidity pools work by actually using one.</strong>
 
-<p align="center">
-  An interactive Uniswap V2-style AMM simulator built with Solidity, Next.js, and Ethereum Sepolia.
-</p>
+An interactive Uniswap V2-style AMM simulator built with Solidity, Next.js, and Ethereum Sepolia.
 
-<p align="center">
-  <a href="https://bitpool-sim.vercel.app">Live Demo</a>
-  ·
-  <a href="https://github.com/3nylar/Bitpool">GitHub</a>
-</p>
+<a href="https://bitpool-sim.vercel.app">Live Demo</a>
+·
+<a href="https://github.com/3nylar/Bitpool">GitHub</a>
+
 
 ---
 
