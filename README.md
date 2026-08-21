@@ -1,163 +1,591 @@
-# Bitpool — Liquidity Pool Simulator
+# Bitpool
 
-An educational, production-ready frontend app for learning how automated market
-makers (constant-product AMMs) actually work — by running one. Real smart
-contract, real on-chain mechanics, real (if valueless) tokens on a public
-Ethereum test network. No real money, ever.
+<p align="center">
+  <strong>Learn how DeFi liquidity pools work by actually using one.</strong>
+</p>
 
-This repo contains two independent projects:
+<p align="center">
+  An interactive Uniswap V2-style AMM simulator built with Solidity, Next.js, and Ethereum Sepolia.
+</p>
 
+<p align="center">
+  <a href="https://bitpool-sim.vercel.app">Live Demo</a>
+  ·
+  <a href="https://github.com/3nylar/Bitpool">GitHub</a>
+</p>
+
+---
+
+## What is Bitpool?
+
+Bitpool is an interactive **automated market maker (AMM) simulator** designed to make DeFi mechanics easier to understand through hands-on experimentation.
+
+Instead of only reading about:
+
+- `x × y = k`
+- liquidity pools
+- swaps
+- trading fees
+- price impact
+- impermanent loss
+
+...you can interact with an actual Solidity AMM deployed on **Ethereum Sepolia** and watch the pool state change on-chain.
+
+> **No real money. No mainnet funds. Just DeFi mechanics you can actually interact with.**
+
+---
+
+## Try It
+
+**[Launch Bitpool →](https://bitpool-sim.vercel.app)**
+
+Connect a wallet on **Ethereum Sepolia**, claim free test tokens from the faucet, and start experimenting with the pool.
+
+The simulator reads its pool state directly from the deployed smart contracts rather than pretending the numbers are happening client-side.
+
+---
+
+## Features
+
+### Token Swaps
+
+Execute swaps against a constant-product AMM and see how your trade affects:
+
+- execution price
+- pool reserves
+- price impact
+- trading fees
+- output amount
+
+### Liquidity Provision
+
+Add liquidity to the pool and receive an LP position.
+
+You can:
+
+- deposit both tokens
+- monitor your position
+- remove liquidity
+- track the value of your LP position
+
+### Impermanent Loss
+
+Bitpool visualizes your LP position against a simple "hold" baseline so you can see how changes in the pool's relative token price affect your position.
+
+### Live Pool Data
+
+The dashboard exposes live on-chain information including:
+
+- token reserves
+- pool price
+- liquidity
+- swap activity
+- fees
+- price movement
+
+### Price Impact
+
+Preview how a trade affects the pool before executing it.
+
+### Trading Fees
+
+Swaps generate fees for liquidity providers, allowing you to see how fee accumulation affects an LP position.
+
+### Simulate Market Activity
+
+Use the built-in market activity simulation to execute multiple swaps on-chain and watch the pool respond.
+
+### Wallet Authentication
+
+Bitpool supports **Sign-In With Ethereum (SIWE)** so users can authenticate by signing a message with their wallet.
+
+Email magic-link authentication is also available as a fallback.
+
+---
+
+## How the AMM Works
+
+Bitpool uses the constant-product AMM model:
+
+```text
+x × y = k
 ```
-contracts/   Solidity smart contracts (Hardhat) — the AMM pool + mock tokens
-frontend/         Next.js 15 frontend — landing page, auth, and the simulator dashboard
+
+Where:
+
+- `x` = reserve of Token A
+- `y` = reserve of Token B
+- `k` = constant product
+
+When a user swaps tokens, the pool's reserves change while the invariant is maintained, subject to the pool's trading fee.
+
+This lets you see the mechanics behind decentralized exchanges instead of treating them as a black box.
+
+---
+
+## Architecture
+
+```text
+                         BITPOOL
+                            │
+              ┌─────────────┴─────────────┐
+              │                           │
+          FRONTEND                    BLOCKCHAIN
+              │                           │
+        Next.js 15                  Ethereum Sepolia
+              │                           │
+       wagmi / viem                        │
+              │                           │
+              └─────────────┬─────────────┘
+                            │
+                    LiquidityPoolAMM
+                            │
+                 ┌──────────┴──────────┐
+                 │                     │
+              Token A               Token B
+                 │                     │
+                 └──────────┬──────────┘
+                            │
+                       x × y = k
+                            │
+          ┌─────────────────┼─────────────────┐
+          │                 │                 │
+        Swaps          Liquidity           Fees
+          │                 │                 │
+          └─────────────────┼─────────────────┘
+                            │
+                    Pool Analytics
+                            │
+             ┌──────────────┴──────────────┐
+             │                             │
+        Price Impact                Impermanent Loss
 ```
 
 ---
 
-## 1. What's actually implemented
+## Tech Stack
 
-**Contracts** (`contracts/contracts/`)
+### Smart Contracts
 
-- `LiquidityPoolAMM.sol` — a Uniswap-V2-style constant-product (`x·y=k`) pool for two ERC-20 tokens: `addLiquidity`, `removeLiquidity`, `swap`, and a `batchSwap` convenience function for one-click "simulate market activity." Implements the first-depositor manipulation mitigation, checks-effects-interactions + `ReentrancyGuard`, and full custom-error revert reasons.
-- `MockERC20.sol` — a free, valueless, mintable token with a public `faucet()`.
-- **13 passing tests** (`contracts/test/LiquidityPoolAMM.test.js`) covering liquidity math, swap math, the fee mechanism, the first-depositor attack, slippage protection, and the batch-swap feature. Run them with `npm test` inside `contracts/`.
+- **Solidity**
+- **Hardhat**
+- **OpenZeppelin**
+- **Ethereum Sepolia**
+- ERC-20 mock tokens
 
-**Frontend** (`frontend/`)
+### Frontend
 
-- Landing page with a live-feeling animated hero visual, "how it works," feature grid, and FAQ.
-- Authentication via **Auth.js (NextAuth v5)** with two independent sign-in paths:
-  - **Wallet (Sign-In With Ethereum / SIWE)** — the primary path. No password; the wallet signs a message, the server verifies it.
-  - **Email magic link** — a fallback for people without a wallet yet.
-- The simulator dashboard: live pool overview, swap panel with real-time price-impact preview, add/remove liquidity, a live price chart, an impermanent-loss chart (your LP value vs. a "held" baseline), a fee-accrual indicator, and a one-click "simulate market activity" feature.
-- Every number in the simulator is read directly from the deployed contract — nothing is faked client-side.
+- **Next.js 15**
+- **React**
+- **TypeScript**
+- **Tailwind CSS**
+- **wagmi**
+- **viem**
+
+### Authentication
+
+- **Auth.js / NextAuth v5**
+- **Sign-In With Ethereum (SIWE)**
+- Email magic links
+
+### Data & Persistence
+
+- **Prisma**
+- **SQLite** for local development
+- PostgreSQL-compatible setup for production
 
 ---
 
-## 2. Prerequisites
+## What's Actually Implemented
+
+### Smart Contracts
+
+`contracts/contracts/`
+
+#### `LiquidityPoolAMM.sol`
+
+A Uniswap V2-style constant-product AMM supporting:
+
+- `addLiquidity`
+- `removeLiquidity`
+- `swap`
+- `batchSwap`
+
+The contract also includes:
+
+- `x × y = k` constant-product pricing
+- trading fees
+- slippage protection
+- custom errors
+- `ReentrancyGuard`
+- checks-effects-interactions
+- `MINIMUM_LIQUIDITY` protection against first-depositor share-price manipulation
+
+#### `MockERC20.sol`
+
+A free, valueless ERC-20 token used for experimentation.
+
+Includes a public faucet so users can obtain test tokens without real funds.
+
+### Tests
+
+The contract suite currently includes **13 passing tests** covering areas such as:
+
+- liquidity math
+- swap math
+- trading fees
+- slippage protection
+- first-depositor attack mitigation
+- batch swaps
+
+Run the test suite with:
+
+```bash
+cd contracts
+npm test
+```
+
+---
+
+## Deployed Network
+
+Bitpool currently runs on:
+
+**Ethereum Sepolia**
+
+The project intentionally uses a public Ethereum test network and valueless test tokens.
+
+### Contract Addresses
+
+After deployment, the contract addresses are written to:
+
+```text
+frontend/lib/contracts/deployments/sepolia.json
+```
+
+If you deploy your own instance, you can verify the contracts on Etherscan and use your own addresses in the frontend.
+
+---
+
+## Run Locally
+
+### Prerequisites
+
+You'll need:
 
 - Node.js 20+
 - npm
-- A Sepolia RPC URL (a provider like [Alchemy](https://www.alchemy.com/) or [Infura](https://www.infura.io/) — the public default RPC is fine for light testing but is rate-limited)
-- A wallet with a small amount of Sepolia ETH for deployment gas ([sepoliafaucet.com](https://sepoliafaucet.com/) or similar)
-- A [WalletConnect Cloud](https://cloud.walletconnect.com/) project ID (free)
-- SMTP credentials for sending email magic links (any provider — Postmark, SendGrid, Resend, or even a Gmail app password for testing)
+- A Sepolia RPC URL
+- A wallet with a small amount of Sepolia ETH for deployment gas
+- A WalletConnect Cloud project ID
+- SMTP credentials if you want to enable email magic links
 
 ---
 
-## 3. Deploy the contracts
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/3nylar/Bitpool.git
+cd Bitpool
+```
+
+---
+
+### 2. Install and test the contracts
 
 ```bash
 cd contracts
 npm install
-cp .env.example .env   # then fill in SEPOLIA_RPC_URL, DEPLOYER_PRIVATE_KEY, ETHERSCAN_API_KEY
-npm test                # 13 tests should pass
-npm run deploy:sepolia  # deploys MockERC20 x2 + LiquidityPoolAMM, seeds initial liquidity
 ```
 
-The deploy script prints the three addresses you need and also writes them
-to `frontend/lib/contracts/deployments/sepolia.json` automatically. Copy them
-into `frontend/.env.local` (see below).
-
-Optionally verify the contracts on Etherscan so anyone can read the source:
+Create your environment file:
 
 ```bash
-npm run verify:sepolia -- <POOL_ADDRESS> <TOKEN_A_ADDRESS> <TOKEN_B_ADDRESS> 30 "LP sUSD/sETH" "LP-SIM"
+cp .env.example .env
 ```
 
-> **A note on this sandbox's build environment:** while developing this
-> project, `npx hardhat compile`'s normal path (downloading the solc binary
-> from `binaries.soliditylang.org`) was blocked by network restrictions
-> specific to that sandbox. A fallback (`npm run compile:offline`, using the
-> pure-JS `solc` npm package) was used instead, and all 13 tests pass
-> against it. In your own environment, plain `npm run compile` / `npm test`
-> will work normally — the offline scripts remain available as a fallback
-> if you ever hit a similarly locked-down network.
+Configure:
+
+```text
+SEPOLIA_RPC_URL=
+DEPLOYER_PRIVATE_KEY=
+ETHERSCAN_API_KEY=
+```
+
+Run the tests:
+
+```bash
+npm test
+```
+
+Deploy to Sepolia:
+
+```bash
+npm run deploy:sepolia
+```
+
+The deployment script deploys:
+
+- Mock Token A
+- Mock Token B
+- LiquidityPoolAMM
+
+and seeds the pool with initial liquidity.
+
+The generated addresses are also written to the frontend deployment file.
 
 ---
 
-## 4. Configure and run the frontend locally
+### 3. Configure the frontend
 
 ```bash
-cd frontend
+cd ../frontend
 npm install
-cp .env.example .env.local   # fill in the contract addresses from step 3, plus auth config
+```
+
+Create the local environment file:
+
+```bash
+cp .env.example .env.local
+```
+
+Add the required contract addresses and authentication configuration.
+
+Generate Prisma:
+
+```bash
 npx prisma generate
-npx prisma migrate deploy    # creates the local SQLite dev database
+```
+
+Create the local database:
+
+```bash
+npx prisma migrate deploy
+```
+
+Start the development server:
+
+```bash
 npm run dev
 ```
 
-Visit `http://localhost:3000`. Sign in with a wallet (Sepolia network) or
-email, claim free tokens from the faucet, and start experimenting.
+Open:
 
-### Auth configuration notes
-
-- `AUTH_SECRET`: generate with `npx auth secret` or `openssl rand -base64 32`.
-- Email magic links require real SMTP credentials to actually send mail — without them, wallet sign-in still works fully.
-- `DATABASE_URL` defaults to a local SQLite file for zero-setup development. **For production, switch to a managed Postgres database** (Vercel Postgres, Neon, Supabase, etc.): change `provider = "postgresql"` in `frontend/prisma/schema.prisma`, point `DATABASE_URL` at it, then run `npx prisma migrate deploy`. No other code changes are needed.
-
----
-
-## 5. Deploying to production (so real users can reach it)
-
-**Recommended stack:** contracts on Sepolia (already done in step 3) + frontend on [Vercel](https://vercel.com).
-
-1. Push this repo to GitHub.
-2. Import the `frontend/` directory as a new Vercel project (set the project **root directory** to `frontend`).
-3. Add all the environment variables from `frontend/.env.example` in Vercel's Project Settings → Environment Variables, using your real Sepolia contract addresses, a production `DATABASE_URL` (Postgres — see above), real SMTP credentials, and a freshly generated `AUTH_SECRET`.
-4. Deploy. Vercel will run `npx prisma generate` automatically as part of the build if you add it to the build command (`prisma generate && next build`), or add a `postinstall` script (already included in `frontend/package.json`) that does this for you.
-5. Your simulator is now live at a public URL — anyone can sign in and use it without running anything locally.
-
-There is nothing in this app that requires the visitor to run a node,
-install anything, or hold real cryptocurrency of any kind.
-
----
-
-## 6. Security notes
-
-- The AMM contract follows checks-effects-interactions and uses `ReentrancyGuard` on every value-moving function.
-- The classic "first-depositor" share-price manipulation attack is mitigated exactly as Uniswap V2 does (a `MINIMUM_LIQUIDITY` amount is permanently locked on the first deposit) — see the dedicated test for a simulated attack attempt.
-- **This contract has not been professionally audited.** It's built for education on a public test network with valueless tokens. Do not deploy it to mainnet or adapt it to hold real value without a proper audit.
-- SIWE (wallet sign-in) uses single-use, server-issued nonces with a 10-minute expiry to prevent signature replay.
-
----
-
-## 7. Known simplifications (documented, not accidental)
-
-- **Impermanent-loss baseline is stored client-side** (`localStorage`, keyed by wallet address) rather than in a backend indexer database. This is called out directly in `frontend/lib/hooks/useDepositBaseline.ts`. A larger-scale deployment would move this to the off-chain indexer described in the project's PRD, so it survives across devices.
-- **Price/reserve chart history resets on page reload**, backfilled from a short recent block window on load. It's a live session view, not a permanent historical archive.
-- **"Simulate market activity" runs from the signed-in user's own wallet** via the contract's `batchSwap` function (one signature, several trades) rather than a separate always-on backend bot wallet — simpler to run, no infrastructure to maintain, and just as real on-chain.
-
----
-
-## 8. Project structure
-
+```text
+http://localhost:3000
 ```
-contracts/
-  contracts/LiquidityPoolAMM.sol
-  contracts/MockERC20.sol
-  test/LiquidityPoolAMM.test.js
-  scripts/deploy.js
-  scripts/syncAbi.js
-  build.js                      (offline solc-js fallback compiler)
 
-frontend/
-  app/
-    page.tsx                    landing page
-    login/page.tsx               sign-in (wallet + email)
-    simulator/page.tsx           main dashboard (auth-protected)
-    api/auth/[...nextauth]/      Auth.js route handler
-    api/auth/siwe-nonce/         SIWE nonce issuance endpoint
-  components/
-    landing/                    hero, how-it-works, features, FAQ
-    auth/                       wallet + email sign-in components
-    simulator/                  pool overview, swap, liquidity, charts, etc.
-    ui/                         shared Button/Card/Badge/Tooltip primitives
-  lib/
-    contracts/                  ABIs + addresses
-    hooks/                      pool state, user position, deposit baseline
-    math/amm.ts                 client-side AMM math mirroring the contract
-    auth.ts, prisma.ts, wagmi.ts
-  prisma/schema.prisma
-  middleware.ts                 protects /simulator behind sign-in
+---
+
+## Authentication
+
+Bitpool supports two authentication paths.
+
+### Sign-In With Ethereum
+
+Users can authenticate with their wallet without creating a password.
+
+The flow uses:
+
+1. Server-issued nonce
+2. Wallet signature
+3. Server-side signature verification
+4. Single-use nonce
+5. Nonce expiry
+
+This helps prevent signature replay attacks.
+
+### Email Magic Link
+
+Users can alternatively authenticate using an email magic link.
+
+Wallet authentication does not require SMTP configuration.
+
+---
+
+## Security
+
+The AMM contract includes several defensive measures:
+
+- `ReentrancyGuard`
+- checks-effects-interactions
+- custom Solidity errors
+- slippage protection
+- minimum liquidity locking
+- first-depositor attack mitigation
+
+### Important
+
+**Bitpool has not been professionally audited.**
+
+The contracts are intended for **education and experimentation on Ethereum Sepolia**.
+
+Do **not** deploy the contracts to mainnet or use them to hold real funds without a professional smart-contract security audit.
+
+---
+
+## Known Simplifications
+
+Bitpool intentionally makes a few simplifications to keep the project focused and easy to run.
+
+### Impermanent-loss baseline
+
+The user's LP baseline is currently stored client-side using `localStorage`, keyed by wallet address.
+
+A larger production deployment would move this into an indexed backend so the position can persist across devices.
+
+### Chart history
+
+Price and reserve chart history currently represents the active simulator session.
+
+The chart can backfill a short recent block window when the page loads, but it is not a permanent historical index.
+
+### Market simulation
+
+The "Simulate Market Activity" feature uses the signed-in user's wallet to execute the `batchSwap` function.
+
+It does not depend on a permanently running bot wallet.
+
+---
+
+## Project Structure
+
+```text
+Bitpool/
+│
+├── contracts/
+│   ├── contracts/
+│   │   ├── LiquidityPoolAMM.sol
+│   │   └── MockERC20.sol
+│   │
+│   ├── test/
+│   │   └── LiquidityPoolAMM.test.js
+│   │
+│   ├── scripts/
+│   │   ├── deploy.js
+│   │   └── syncAbi.js
+│   │
+│   └── build.js
+│
+├── frontend/
+│   ├── app/
+│   │   ├── page.tsx
+│   │   ├── login/
+│   │   ├── simulator/
+│   │   └── api/
+│   │
+│   ├── components/
+│   │   ├── landing/
+│   │   ├── auth/
+│   │   ├── simulator/
+│   │   └── ui/
+│   │
+│   ├── lib/
+│   │   ├── contracts/
+│   │   ├── hooks/
+│   │   ├── math/
+│   │   ├── auth.ts
+│   │   ├── prisma.ts
+│   │   └── wagmi.ts
+│   │
+│   ├── prisma/
+│   │   └── schema.prisma
+│   │
+│   └── middleware.ts
+│
+└── README.md
 ```
-by Enilara Adefila
+
+---
+
+## Roadmap
+
+### AMM & DeFi
+
+- [x] Constant-product AMM
+- [x] Token swaps
+- [x] Add/remove liquidity
+- [x] Trading fees
+- [x] Price-impact preview
+- [x] Impermanent-loss visualization
+- [x] Market activity simulation
+- [x] Sepolia deployment
+- [x] Contract test suite
+
+### Analytics
+
+- [ ] Persistent historical pool data
+- [ ] Event indexing
+- [ ] Advanced LP analytics
+- [ ] Historical impermanent-loss tracking
+- [ ] More detailed fee analytics
+
+### Protocol
+
+- [ ] Multiple liquidity pools
+- [ ] Multi-token support
+- [ ] More configurable pool parameters
+- [ ] Expanded contract test coverage
+
+### Production
+
+- [ ] Professional smart-contract audit
+- [ ] Production database
+- [ ] Mainnet deployment after audit
+- [ ] Production monitoring
+
+---
+
+## Why This Project Exists
+
+AMMs are often introduced through equations and diagrams.
+
+That's useful, but it doesn't always make the mechanics intuitive.
+
+Bitpool was built around a simple idea:
+
+> **Don't just learn how an AMM works. Use one.**
+
+By interacting with the pool, you can see how a trade changes reserves, how liquidity providers earn fees, and how changes in relative token prices can create impermanent loss.
+
+The goal is to make DeFi mechanics **observable, interactive, and easier to understand.**
+
+---
+
+## Contributing
+
+Contributions, ideas, bug reports, and educational improvements are welcome.
+
+If you find a bug or have an idea for improving the simulator:
+
+1. Open an issue.
+2. Explain the problem or proposed improvement.
+3. Include reproduction steps where applicable.
+4. Submit a pull request for approved changes.
+
+---
+
+## License
+
+See the repository for the applicable license and project terms.
+
+---
+
+## Author
+
+**Enilara Adefila**
+
+Built as an exploration of:
+
+- decentralized finance
+- automated market makers
+- Solidity smart contracts
+- Ethereum
+- Web3 frontend development
+- on-chain application architecture
+
+---
+
+<p align="center">
+  <strong>Bitpool — Learn AMMs by actually using one.</strong>
+</p>
